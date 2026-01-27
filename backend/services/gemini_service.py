@@ -1,5 +1,5 @@
 import os
-import google.generativeai as genai
+from openai import AsyncOpenAI
 from dotenv import load_dotenv
 
 # 加载环境变量
@@ -7,26 +7,39 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(__file__)),
 
 class GeminiService:
     def __init__(self):
-        self.api_key = os.getenv("GEMINI_API_KEY")
+        self.api_key = os.getenv("OPEN_ROUTER_API_KEY")
         if not self.api_key:
-            raise ValueError("GEMINI_API_KEY not found in environment variables")
-        
-        genai.configure(api_key=self.api_key)
-        # 遇到 404 错误，回退到最稳定的 gemini-pro
-        self.model = genai.GenerativeModel('gemini-pro') 
+            # Fallback to verify if GEMINI_API_KEY was intended, but strictly we need OpenRouter key now
+            print("Warning: OPEN_ROUTER_API_KEY not found, checking for GEMINI_API_KEY as backup...")
+            self.api_key = os.getenv("GEMINI_API_KEY")
+            
+        if not self.api_key:
+             raise ValueError("API Key not found. Please set OPEN_ROUTER_API_KEY in .env")
 
-    def generate_content(self, prompt: str) -> str:
-        try:
-            response = self.model.generate_content(prompt)
-            return response.text
-        except Exception as e:
-            return f"Error communicating with Gemini: {str(e)}"
+        # OpenRouter Configuration
+        self.client = AsyncOpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=self.api_key,
+        )
+        # Using a model that is likely available on OpenRouter free tier or generally available
+        # google/gemini-2.0-flash-lite-preview-02-05:free is a good candidate if available, 
+        # or google/gemini-pro-1.5 which is often supported.
+        # Let's stick to a safe default: google/gemini-pro
+        self.model_name = "google/gemini-pro"
 
     async def generate_content_async(self, prompt: str) -> str:
-        # 简单的异步包装，Gemini Python SDK 原生支持异步吗？
-        # SDK 的 generate_content_async 是存在的
         try:
-            response = await self.model.generate_content_async(prompt)
-            return response.text
+            response = await self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ],
+                # OpenRouter specific headers if needed
+                extra_headers={
+                    "HTTP-Referer": "https://ai-mirror.vercel.app", # Optional, for OpenRouter rankings
+                    "X-Title": "AI Mirror"
+                }
+            )
+            return response.choices[0].message.content
         except Exception as e:
-            return f"Error communicating with Gemini: {str(e)}"
+            return f"Error communicating with OpenRouter: {str(e)}"
