@@ -1,9 +1,14 @@
 import axios from 'axios';
 
+// 区分开发环境和生产环境
+const baseURL = import.meta.env.PROD 
+  ? 'https://ai-mirror-by6k.onrender.com' // 生产环境（Render 后端）
+  : '/api'; // 开发环境（本地代理）
+
 // 创建一个 axios 实例
 const api = axios.create({
-  baseURL: '/api', // 使用相对路径，触发 Vite 代理
-  timeout: 30000, // 请求超时时间增加到 30s
+  baseURL: baseURL,
+  timeout: 30000, // 请求超时时间
   headers: {
     'Content-Type': 'application/json',
   },

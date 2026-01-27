@@ -10,7 +10,7 @@ app = FastAPI()
 origins = [
     "http://localhost:5173",  # 本地前端开发地址
     "http://127.0.0.1:5173",
-    # 未来部署后的域名也要加在这里
+    "https://ai-mirror-psi.vercel.app", # Vercel 前端域名
 ]
 
 app.add_middleware(
@@ -47,6 +47,3 @@ async def chat(request: ChatRequest):
     # 这里暂时直接调用 Gemini，后续会加入 Memory 逻辑
     response = await gemini_service.generate_content_async(request.message)
     return {"reply": response}
-    
-    # --- 测试模式：绕过 Gemini ---
-    # return {"reply": f"【测试模式】后端收到了你的消息：{request.message}。由于网络原因暂时无法连接 AI，但这证明前后端通信是完全正常的！"}
