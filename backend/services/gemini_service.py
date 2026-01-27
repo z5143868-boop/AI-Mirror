@@ -12,7 +12,8 @@ class GeminiService:
             raise ValueError("GEMINI_API_KEY not found in environment variables")
         
         genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel('gemini-1.5-flash') # 使用 1.5 Flash，速度快且便宜，适合开发测试
+        # 遇到 404 错误，回退到最稳定的 gemini-pro
+        self.model = genai.GenerativeModel('gemini-pro') 
 
     def generate_content(self, prompt: str) -> str:
         try:
