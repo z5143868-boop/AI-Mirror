@@ -22,10 +22,8 @@ class GeminiService:
             api_key=self.api_key,
         )
         # Using a model that is likely available on OpenRouter free tier or generally available
-        # google/gemini-2.0-flash-lite-preview-02-05:free is a good candidate if available, 
-        # or google/gemini-pro-1.5 which is often supported.
-        # Let's stick to a safe default: google/gemini-pro
-        self.model_name = "google/gemini-pro"
+        # Updated to a known valid model ID on OpenRouter
+        self.model_name = "google/gemini-2.0-flash-001" 
 
     async def generate_content_async(self, prompt: str) -> str:
         try:
