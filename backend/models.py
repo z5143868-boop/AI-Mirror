@@ -2,57 +2,62 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 from pydantic import BaseModel, Field
 
-# 1.1 核心逻辑实体 (ER Diagram Mapped to Pydantic)
+# --- Stage 0: Anchor Status (Static Data) ---
 
-# --- JSON Field Structures ---
+class AnchorStatus(BaseModel):
+    gender: str = ""
+    age_group: str = "" # e.g. "25-30"
+    occupation: str = ""
+    financial_status: str = "" # e.g. "Stable", "Anxious"
+    core_trouble: str = "" # 当前核心困扰
 
-class BasicInfo(BaseModel):
-    nickname: Optional[str] = None
-    age: Optional[int] = None
-    gender: Optional[str] = None
-    job: Optional[str] = None
-    income: Optional[str] = None
+# --- Psych Profile (Core Analysis) ---
 
-class EnergyMap(BaseModel):
-    high_energy: List[str] = Field(default_factory=list)
-    low_energy: List[str] = Field(default_factory=list)
-    fear: str = ""
+class PsychProfile(BaseModel):
+    core_drive: str = "Unknown"  # 核心驱动：尊严/控制/恐惧/欲望
+    stress_reaction: str = "Unknown" # 压力反应：逃避/攻击/躯体化
+    conflict_type: str = "Unknown" # 核心冲突：自由vs安全
+    risk_level: str = "Unknown" # Low/Medium/High
+    mbti: Optional[str] = None # Keep for compatibility if needed
 
-# --- Core Entities ---
+# --- Interaction Logs ---
 
-class User(BaseModel):
-    user_id: str
-    open_id: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.now)
+class InteractionLog(BaseModel):
+    stage: str # "Stage 1", "Stage 2", "Stage 3"
+    question_context: str
+    user_choice: str
+    ai_analysis: str # Immediate feedback/analysis
+    timestamp: datetime = Field(default_factory=datetime.now)
+
+# --- Main User Entity ---
 
 class UserProfile(BaseModel):
+    user_id: str
     profile_id: str
-    user_id: str
-    basic_info: BasicInfo = Field(default_factory=BasicInfo)
-    mbti_result: Optional[str] = None
-    energy_map: EnergyMap = Field(default_factory=EnergyMap)
-    rolling_summary: str = "" # 滚动记忆摘要 (RAG核心)
-    completeness: float = 0.0 # 0-100
-
-class ScenarioLog(BaseModel):
-    log_id: str
-    user_id: str
-    scenario_context: str
-    user_choice: str # A/B/C/D
-    psychological_projection: str # 选项背后的心理含义
-    created_at: datetime = Field(default_factory=datetime.now)
-
-class ShadowLog(BaseModel):
-    log_id: str
-    user_id: str
-    question: str
-    is_admitted: bool # Yes/No
-    is_skipped: bool = False
-    created_at: datetime = Field(default_factory=datetime.now)
+    
+    # Stage 0 Data
+    static_data: AnchorStatus = Field(default_factory=AnchorStatus)
+    
+    # Analysis Result
+    psych_profile: PsychProfile = Field(default_factory=PsychProfile)
+    
+    # Interaction History (Raw Data)
+    raw_interactions: List[InteractionLog] = Field(default_factory=list)
+    
+    # Compatibility Fields (Optional)
+    basic_info: Optional[Dict] = None 
+    rolling_summary: str = "" 
+    
+    # State Machine
+    current_stage: int = 0 # 0 (Onboarding), 1 (Surface), 2 (Drive), 3 (Shadow), 4 (Report)
+    stage_question_count: int = 0 # Track progress within a stage
 
 class AnalysisReport(BaseModel):
     report_id: str
     user_id: str
-    full_markdown: str
-    version: int
+    core_persona: str # 核心画像定义
+    inner_conflict: str # 内在死结
+    risk_prediction: str # 行为预测
+    evolution_suggestion: str # 进化建议
+    full_markdown: str # Legacy/Full text
     created_at: datetime = Field(default_factory=datetime.now)

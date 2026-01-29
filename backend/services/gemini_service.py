@@ -25,12 +25,43 @@ class GeminiService:
         # Updated to a known valid model ID on OpenRouter
         self.model_name = "google/gemini-2.0-flash-001" 
 
-    async def generate_content_async(self, prompt: str) -> str:
+    async def generate_content_async(self, prompt: str, image_data: str = None) -> str:
         try:
+            message_content = []
+            if image_data:
+                # Ensure image_data is formatted correctly as a data URL if it isn't already
+                if not image_data.startswith("data:image"):
+                    # Assume it's base64 raw data, default to jpeg if unknown, but better to handle in caller
+                    # For now, let's assume the caller passes the full data URL or valid base64
+                    # Standard OpenAI format expects data URL for base64
+                    image_url = image_data if image_data.startswith("http") or image_data.startswith("data:") else f"data:image/jpeg;base64,{image_data}"
+                    
+                    message_content = [
+                        {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": image_url
+                            }
+                        }
+                    ]
+                else:
+                     message_content = [
+                        {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": image_data
+                            }
+                        }
+                    ]
+            else:
+                message_content = prompt
+
             response = await self.client.chat.completions.create(
                 model=self.model_name,
                 messages=[
-                    {"role": "user", "content": prompt}
+                    {"role": "user", "content": message_content}
                 ],
                 # OpenRouter specific headers if needed
                 extra_headers={
