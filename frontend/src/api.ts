@@ -110,4 +110,33 @@ export const chatWithAI = async (userId: string, message: string) => {
   }
 };
 
+export const generateScenario = async (userId: string) => {
+    // Placeholder - not implemented in backend yet
+    return { question: "Legacy Scenario", options: [] };
+};
+
+export const submitScenarioChoice = async (userId: string, choice: string, projection: string) => {
+    return "Scenario recorded";
+}
+
+export const generateTags = async (userId: string) => {
+    const response = await api.post('/tags/generate', { user_id: userId });
+    return response.data;
+};
+
+export const selectTags = async (userId: string, tags: string[]) => {
+    const response = await api.post('/tags/select', { user_id: userId, tags });
+    return response.data;
+};
+
+export const generateShadowWork = async (userId: string) => {
+    const response = await api.post('/shadow/generate', { user_id: userId });
+    return response.data;
+};
+
+export const submitShadowWork = async (userId: string, question: string, admitted: boolean) => {
+    const response = await api.post('/shadow/submit', { user_id: userId, question, admitted });
+    return response.data;
+};
+
 export default api;

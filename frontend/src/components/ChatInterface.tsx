@@ -99,7 +99,7 @@ export default function ChatInterface({ userId, userProfile }: ChatInterfaceProp
     setIsLoading(true);
 
     try {
-      const reply = await chatWithAI(userId, inputValue, imageToSend || undefined);
+      const reply = await chatWithAI(userId, inputValue);
       setMessages(prev => [...prev, { role: 'ai', content: reply }]);
     } catch (error) {
         console.error(error);

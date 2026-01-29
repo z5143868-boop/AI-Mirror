@@ -24,11 +24,12 @@ origins = [
     "http://localhost:5174",
     "http://127.0.0.1:5174",
     "https://ai-mirror-psi.vercel.app",
+    "https://ai-mirror-*-theos-projects-6eb0b9cb.vercel.app", # Wildcard for preview deployments
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"], # Allow all origins for simplicity in this stage, or use the list above if preferred strictness
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
