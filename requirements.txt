@@ -1,7 +1,4 @@
 fastapi
-uvicorn[standard]
-google-generativeai
-python-dotenv
-pydantic
+pydantic>=2.0.0
 openai
-watchfiles
+python-dotenv
