@@ -1,7 +1,12 @@
 import axios from 'axios';
 
 // Local development URL
-const baseURL = import.meta.env.PROD ? '/api' : 'http://127.0.0.1:8000/api';
+// For Vercel, we need to use the full URL if we're not on the same domain or if the proxy isn't working as expected.
+// However, the cleanest way in Vercel is to use relative paths if hosted on the same domain.
+// But let's try to be explicit about the Vercel API URL.
+const baseURL = import.meta.env.PROD 
+  ? 'https://ai-mirror-psi.vercel.app/api' 
+  : 'http://127.0.0.1:8000/api';
 
 const api = axios.create({
   baseURL,
