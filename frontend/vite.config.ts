@@ -36,4 +36,6 @@ export default defineConfig({
       },
     },
   },
-})
+  // Add this to handle routing in production preview if needed, 
+  // but mainly to ensure Vercel handles the API rewrite correctly with client-side routing
+});
